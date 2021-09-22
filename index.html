@@ -11,34 +11,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="characters-and-actions">
-        <div class="battle-arena">
-            <div class="character">
-                <div class="health-bar">
-                    <div class="inner-health-bar" id="hero-health"></div>
-                </div>
-                <img src="assets/elf.png">
-                <span class="name" id="hero-name">Herói</span>
+    <div id="initial-form">
+        <form id="player-name-form">
+            <div>
+                <label for="player-name">Aventureiro, nos diga seu nome:</label>
+                <input type="text" id="player-name" name="player-name">
             </div>
-            <div class="character">
-                <div class="health-bar">
-                    <div class="inner-health-bar" id="enemy-health"></div>
+            <button class="button" type="submit" id="start-game-button">Iniciar batalha</button>
+        </form>
+    </div>
+    <main id="game-content">
+        <div class="characters-and-actions">
+            <div class="battle-arena">
+                <div class="character">
+                    <div class="health-bar">
+                        <div class="inner-health-bar" id="hero-health"></div>
+                    </div>
+                    <img src="assets/heros/elf.png">
+                    <span class="name" id="hero-name"></span>
                 </div>
-                <img src="assets/devil.png">
-                <span class="name" id="enemy-name">Inimigo</span>
+                <div class="character">
+                    <div class="health-bar">
+                        <div class="inner-health-bar" id="enemy-health"></div>
+                    </div>
+                    <img src="assets/enemies/devil.png">
+                    <span class="name" id="enemy-name">Inimigo</span>
+                </div>
+            </div>
+            <div id="button-wrapper">
+                <button class="action-button button" id="attack-button">Atacar</button>
+                <button class="action-button button" id="use-potion-button">Usar poção</button>
+                <button class="action-button button" id="give-up-button">Desistir</button>
             </div>
         </div>
-        <button class="button" id="start-game-button">Iniciar batalha</button>
-        <div id="button-wrapper">
-            <button class="action-button button" id="attack-button">Atacar</button>
-            <button class="action-button button" id="use-potion-button">Usar poção</button>
-            <button class="action-button button" id="give-up-button">Desistir</button>
+        <div class="action-log">
+            <h2>Histórico da batalha</h2>
+            <div id="actions-log"></div>
         </div>
-    </div>
-    <div class="action-log">
-        <h2>Histórico da batalha</h2>
-        <div id="actions-log"></div>
-    </div>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
