@@ -14,8 +14,8 @@ This project is a simple introduction to JavaScript. By making a battle in turns
 - The enemy play is determined by their live and by a random factor;
 
 ## Improvements
-- [] Add classes for players
-- [] Add different enemies that appear randomly
-- [] Add mana and exp logic
-- [] Add stages
-- [] Add loot and inventory logic
+- Add classes for players
+- Add different enemies that appear randomly
+- Add mana and exp logic
+- Add stages
+- Add loot and inventory logic
