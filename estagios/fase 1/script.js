@@ -2,15 +2,19 @@ const actions_log = document.getElementById('actions-log')
 const hero_health = document.getElementById('hero-health')
 const enemy_health = document.getElementById('enemy-health')
 
-const heroIndex = ['bard', 'healer', 'tank', 'ninja', 'warrior', 'mage']
-const herosList = [
-    { health: 90, attack: 8, potions: 5 },
-    { health: 90, attack: 8, potions: 5 },
-    { health: 150, attack: 5, potions: 2 },
-    { health: 50, attack: 16, potions: 4 },
-    { health: 100, attack: 5, potions: 3 },
-    { health: 50, attack: 20, potions: 4 }
-]
+const heroOriginal = {
+    name: 'heroi',
+    health: 90,
+    attack: 5,
+    potions: 3
+}
+
+const enemyOriginal = {
+    name: 'inimigo',
+    health: 65,
+    attack: 7,
+    potions: 2
+}
 
 let isPlayerTurn = false
 let hero
@@ -20,8 +24,6 @@ const attack_button = document.getElementById('attack-button')
 attack_button.addEventListener('click', () => {
     if (isPlayerTurn) {
         isPlayerTurn = false
-        hero_health.style.width = `${hero.health / heroOriginal.health * 100}%`
-        enemy_health.style.width = `${enemy.health / enemyOriginal.health * 100}%`
         handleAttack(hero, enemy)
         enemy.health > 0 ? handleEnemyAction() : handleGameOver(hero.name)
     }
@@ -31,8 +33,6 @@ const use_potion_button = document.getElementById('use-potion-button')
 use_potion_button.addEventListener('click', () => {
     if (isPlayerTurn) {
         isPlayerTurn = false
-        hero_health.style.width = `${hero.health / heroOriginal.health * 100}%`
-        enemy_health.style.width = `${enemy.health / enemyOriginal.health * 100}%`
         handleUsePotion(hero)
         handleEnemyAction()
     }
@@ -49,7 +49,7 @@ give_up_button.addEventListener('click', () => {
 
 const handleAttack = (source, target) => {
     target.health -= source.attack
-    actions_log.innerHTML += `<p>${source.name} escolheu atacar</p>`
+    actions_log.innerHTML += `<p>${source.name} escolheu atacar.</p>`
 }
 
 const handleUsePotion = (target) => {
@@ -67,29 +67,23 @@ const handleEnemyAction = () => {
         handleAttack(enemy, hero)
     }
     isPlayerTurn = true
+
+    actions_log.innerHTML += `<p>Vida do herói: ${hero.health}. Vida do inimigo: ${enemy.health}</p>`
 }
 
 const handleGameOver = (winner) => {
     isPlayerTurn = false
-    hero_health.style.width = `${hero.health / heroOriginal.health * 100}%`
-    enemy_health.style.width = `${enemy.health / enemyOriginal.health * 100}%`
+    document.getElementById('start-game-button').style.display = 'block'
     document.getElementById('button-wrapper').style.display = 'none'
     actions_log.innerHTML += `<p>${winner} venceu.</p>`
 }
 
-const playerNameForm = document.getElementById('player-form')
-playerNameForm.addEventListener('submit', (event) => {
-    event.preventDefault()
+const startGameButton = document.getElementById('start-game-button')
+startGameButton.addEventListener('click', () => {
     isPlayerTurn = true
-    document.getElementById('form-wrapper').style.display = 'none'
-    document.getElementById('game-content').style.display = 'flex'
-    heroName = document.getElementById('player-name').value
-
-    const character = document.querySelector('input[name="character-selection"]:checked').value;
-
-    hero = { name: heroName, ...herosList[heroIndex.indexOf(character)] }
-    console.log(hero);
+    hero = JSON.parse(JSON.stringify(heroOriginal))
     enemy = JSON.parse(JSON.stringify(enemyOriginal))
-    document.getElementById('hero-name').innerText = hero.name
     actions_log.innerHTML = ''
+    document.getElementById('button-wrapper').style.display = 'block'
+    document.getElementById('start-game-button').style.display = 'none'
 })

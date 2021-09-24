@@ -4,17 +4,74 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>RPG Battle</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="initial-form">
-        <form id="player-name-form">
+    <div id="form-wrapper">
+        <form id="player-form">
+            <span class="question-label">Quem vem lá?</span>
+            <div class="charater-selection-wrapper">
+                <div>
+                    <input type="radio" id="bard" name="character-selection" value="bard">
+                    <label for="bard">
+                        <div class="character-class">
+                            <img src="assets/heros/bard.png" width="150">
+                            <span>Bardo</span>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="healer" name="character-selection" value="healer">
+                    <label for="healer">
+                        <div class="character-class">
+                            <img src="assets/heros/elf.png" width="150">
+                            <span>Curandeiro</span>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="tank" name="character-selection" value="tank">
+                    <label for="tank">
+                        <div class="character-class">
+                            <img src="assets/heros/knight.png" width="150">
+                            <span>Tanque</span>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="ninja" name="character-selection" value="ninja">
+                    <label for="ninja">
+                        <div class="character-class">
+                            <img src="assets/heros/ninja.png" width="150">
+                            <span>Ninja</span>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" id="warrior" name="character-selection" value="warrior">
+                    <label for="warrior">
+                        <div class="character-class">
+                            <img src="assets/heros/warrior.png" width="150">
+                            <span>Guerreiro</span>
+                        </div>
+                    </label>
+                </div> 
+                <div>
+                    <input type="radio" id="mage" name="character-selection" value="mage">
+                    <label for="mage">
+                        <div class="character-class">
+                            <img src="assets/heros/wizard.png" width="150">
+                            <span>Mago</span>
+                        </div>
+                    </label>
+                </div>    
+            </div>
             <div>
-                <label for="player-name">Aventureiro, nos diga seu nome:</label>
+                <label for="player-name" class="question-label">Aventureiro, nos diga seu nome:</label>
                 <input type="text" id="player-name" name="player-name">
             </div>
             <button class="button" type="submit" id="start-game-button">Iniciar batalha</button>
