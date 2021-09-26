@@ -1,6 +1,4 @@
 const actions_log = document.getElementById('actions-log')
-const hero_health = document.getElementById('hero-health')
-const enemy_health = document.getElementById('enemy-health')
 
 const heroOriginal = {
     name: 'heroi',
@@ -67,7 +65,6 @@ const handleEnemyAction = () => {
         handleAttack(enemy, hero)
     }
     isPlayerTurn = true
-
     actions_log.innerHTML += `<p>Vida do herói: ${hero.health}. Vida do inimigo: ${enemy.health}</p>`
 }
 
