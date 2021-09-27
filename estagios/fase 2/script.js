@@ -3,15 +3,14 @@ const actionButtonsWrapper = document.getElementById('button-wrapper')
 const initialForm = document.getElementById('form-wrapper')
 const mainGame = document.getElementById('game-content')
 
-const heroIndex = ['bard', 'healer', 'tank', 'ninja', 'warrior', 'mage']
-const herosList = [
-    { health: 90, attack: 8, potions: 5 },
-    { health: 90, attack: 8, potions: 5 },
-    { health: 150, attack: 5, potions: 2 },
-    { health: 50, attack: 16, potions: 4 },
-    { health: 100, attack: 5, potions: 3 },
-    { health: 50, attack: 20, potions: 4 }
-]
+const herosList = {
+    bard: { health: 90, attack: 8 },
+    healer: { health: 90, attack: 8 },
+    tank: { health: 150, attack: 5 },
+    ninja: { health: 50, attack: 16 },
+    warrior: { health: 100, attack: 5 },
+    mage: { health: 50, attack: 20 }
+}
 
 const enemyOriginal = {
     name: 'inimigo',
@@ -65,7 +64,7 @@ const handleUsePotion = (target) => {
 const handleEnemyAction = () => {
     if (enemy.health <= 0) {
         handleGameOver(hero.name)
-    } else if (enemy.potions > 0 && (enemy.health <= 5 || Math.random() > 0.8)) {
+    } else if (enemy.potions > 0 && enemy.health <= 5) {
         handleUsePotion(enemy)
     } else {
         handleAttack(enemy, hero)
@@ -98,9 +97,8 @@ playerNameForm.addEventListener('submit', (event) => {
     mainGame.style.display = 'flex'
     heroName = document.getElementById('player-name').value
 
-    const character = document.querySelector('input[name="character-selection"]:checked').value;
-    hero = { name: heroName, ...herosList[heroIndex.indexOf(character)] }
-    console.log(hero);
+    const character = document.querySelector('input[name="character-selection"]:checked').value
+    hero = { name: heroName, ...herosList[character] }
     enemy = JSON.parse(JSON.stringify(enemyOriginal))
     document.getElementById('hero-name').innerText = hero.name
     const imgWrapper = document.getElementById('hero-img')
