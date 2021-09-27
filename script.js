@@ -13,6 +13,12 @@ const herosList = [
     { health: 50, attack: 20, potions: 4 }
 ]
 
+const enemiesList = [
+    { name: 'Icaco, o demônio', health: 65, attack: 7, potions: 2 },
+    { name: 'Luis, a caveira', health: 30, attack: 5, potions: 3 },
+    { name: 'Wawel, o dragão', health: 40, attack: 15, potions: 5 },
+    { name: 'Luhuu, o ogro', health: 100, attack: 4, potions: 2 }
+]
 const enemyOriginal = {
     name: 'inimigo',
     health: 65,
@@ -100,9 +106,10 @@ playerNameForm.addEventListener('submit', (event) => {
 
     const character = document.querySelector('input[name="character-selection"]:checked').value;
     hero = { name: heroName, ...herosList[heroIndex.indexOf(character)] }
-    console.log(hero);
+    enemy = { ...enemiesList[Math.floor(Math.random() * enemiesList.length)] }
     enemy = JSON.parse(JSON.stringify(enemyOriginal))
     document.getElementById('hero-name').innerText = hero.name
+    document.getElementById('enemy-name').innerText = enemy.name
     const imgWrapper = document.getElementById('hero-img')
     imgWrapper.innerHTML = `<img src="../../assets/heros/${character}.png">` + imgWrapper.innerHTML
     actionsLog.innerHTML = ''
