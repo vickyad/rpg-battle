@@ -1,16 +1,30 @@
 import herosList from './classesData.js'
 import enemiesList from './enemiesData.js'
 
-const actionsLog = document.getElementById('actions-log')
-const actionButtonsWrapper = document.getElementById('button-wrapper')
-const initialForm = document.getElementById('form-wrapper')
-const mainGame = document.getElementById('game-content')
+/* DOM Elements */
 const restartGameButton = document.getElementById('restart-game-button')
+const actionsLog = document.getElementById('actions-log')
+const actionButtonsWrapperStyle = document.getElementById('button-wrapper').style
+const initialFormStyle = document.getElementById('form-wrapper').style
+const mainGameStyle = document.getElementById('game-content').style
+const characterInfoWrapper = document.getElementById('hero-img')
+const enemyInfoWrapper = document.getElementById('enemy-wrapper')
+const enemyName = document.getElementById('enemy-name')
+
+/* Randomize enemies order */
+let enemyOrder
+
+/* Control variables */
+let isPlayerTurn = false
+let hero
+let currentEnemy
+
 
 class Entity {
     constructor(name, health, attack) {
         this.name = name
         this.health = health
+        this.maxHealth = health
         this.attack = attack
         this.potions = 4
     }
@@ -25,35 +39,20 @@ class Entity {
             this.health += 5
         }
     }
+
+    restoreHealth = () => {
+        this.health = this.maxHealth
+    }
 }
 
-let isPlayerTurn = false
-let hero
-let enemy
+window.onbeforeunload = () => {
+    const heroSave = JSON.parse(localStorage.getItem('heroInfo'))
+    heroSave.health = hero.health
+    heroSave.potions = hero.potions
+    localStorage.setItem('heroInfo', JSON.stringify(heroSave))
 
-document.getElementById('attack-button').addEventListener('click', () => {
-    if (isPlayerTurn) {
-        isPlayerTurn = false
-        handleAttack(hero, enemy)
-        enemy.health > 0 ? handleEnemyAction() : handleGameOver(hero.name)
-    }
-})
-
-document.getElementById('use-potion-button').addEventListener('click', () => {
-    if (isPlayerTurn) {
-        isPlayerTurn = false
-        handleUsePotion(hero)
-        handleEnemyAction()
-    }
-})
-
-document.getElementById('give-up-button').addEventListener('click', () => {
-    if (isPlayerTurn) {
-        isPlayerTurn = false
-        actionsLog.innerHTML += `<p>${hero.name} escolheu ser covarde.</p>`
-        handleGameOver('inimigo')
-    }
-})
+    return null
+}
 
 const handleAttack = (source, target) => {
     target.takeDamage(source.attack)
@@ -65,49 +64,143 @@ const handleUsePotion = (target) => {
     actionsLog.innerHTML += `<p>${target.name} escolheu usar poção. ${target.potions} poções restantes</p>`
 }
 
-const handleEnemyAction = () => {
-    if (enemy.health <= 0) {
-        handleGameOver(hero.name)
-    } else if (enemy.health <= 5 || Math.random() > 0.8) {
-        handleUsePotion(enemy)
-    } else {
-        handleAttack(enemy, hero)
-    }
-    isPlayerTurn = true
-    actionsLog.innerHTML += `<p>Vida do herói: ${hero.health}. Vida do inimigo: ${enemy.health}</p>`
-}
-
 const handleGameOver = (winner) => {
     isPlayerTurn = false
-    actionButtonsWrapper.style.display = 'none'
+    actionButtonsWrapperStyle.display = 'none'
     restartGameButton.style.display = 'block'
     actionsLog.innerHTML += `<p>${winner} venceu.</p>`
 }
 
+const makeEnemyMove = () => {
+    if (hero.health <= 0) {
+        return handleGameOver(currentEnemy.name)
+    }
+
+    if (currentEnemy.health <= 0) {
+        return getNextEnemy()
+    }
+
+    if (currentEnemy.health <= 5 || Math.random() > 0.8) {
+        handleUsePotion(currentEnemy)
+    } else {
+        handleAttack(currentEnemy, hero)
+    }
+    isPlayerTurn = true
+    actionsLog.innerHTML += `<p>Vida do herói: ${hero.health}. Vida do inimigo: ${currentEnemy.health}</p>`
+}
+
+const getNextEnemy = () => {
+    if (enemyOrder.length === 0) {
+        handleGameOver(hero.name)
+    } else {
+        actionsLog.innerHTML += `<p>${currentEnemy.name} derrotado.</p>`
+        hero.restoreHealth()
+        saveEnemiesOnLocalStorage()
+        const enemyObject = enemyOrder.pop(0)
+        currentEnemy = new Entity(enemyObject.name, enemyObject.health, enemyObject.attack)
+        enemyInfoWrapper.innerHTML = `<img src="../../assets/enemies/${enemyObject.url}"><span class="name" id="enemy-name">${currentEnemy.name}</span>`
+        actionsLog.innerHTML += `<p>A vida de ${hero.name} foi restaurada</p><p>${currentEnemy.name} é o próximo.</p>`
+    }
+    isPlayerTurn = true
+}
+
+const saveEnemiesOnLocalStorage = () => {
+    const namesArray = []
+    enemyOrder.forEach((item) => {
+        namesArray.push(item.name)
+    })
+    localStorage.setItem('enemiesPending', JSON.stringify(namesArray))
+}
+
+const getEnemiesToBattle = (enemiesName) => {
+    const updatedList = []
+    enemiesName.forEach((name) => {
+        const found = enemiesList.find(element => element.name === name)
+        if (found) {
+            updatedList.push(found)
+        }
+    })
+    return updatedList
+}
+
+const startGame = (heroName, heroClass, heroHealth, heroAttack, heroPotions, newGame) => {
+    isPlayerTurn = true
+
+    /* Set displays */
+    restartGameButton.style.display = 'none'
+    actionButtonsWrapperStyle.display = 'block'
+    initialFormStyle.display = 'none'
+    mainGameStyle.display = 'flex'
+
+    /* Get and set enemy */
+    let battleHistory = JSON.parse(localStorage.getItem('enemiesPending'))
+    if (!battleHistory || newGame) {
+        enemyOrder = enemiesList.sort(() => Math.random() - 0.5)
+        saveEnemiesOnLocalStorage()
+    } else {
+        enemyOrder = getEnemiesToBattle(battleHistory)
+    }
+    const enemyObject = enemyOrder.pop(0)
+    currentEnemy = new Entity(enemyObject.name, enemyObject.health, enemyObject.attack)
+    enemyInfoWrapper.innerHTML = `<img src="../../assets/enemies/${enemyObject.url}"><span class="name" id="enemy-name">${currentEnemy.name}</span>`
+
+    /* Set hero */
+    hero = new Entity(heroName, heroHealth, heroAttack)
+    if (newGame) {
+        localStorage.setItem('heroInfo', JSON.stringify({ name: heroName, class: heroClass, health: heroHealth, attack: heroAttack, potions: hero.potions }))
+    } else {
+        hero.potions = heroPotions
+    }
+    characterInfoWrapper.innerHTML = `<img src="../../assets/heros/${heroClass}.png">` + characterInfoWrapper.innerHTML
+    document.getElementById('hero-name').innerText = hero.name
+
+    /* Clean log */
+    actionsLog.innerHTML = ''
+}
+
 restartGameButton.addEventListener('click', () => {
-    mainGame.style.display = 'none'
-    initialForm.style.display = 'flex'
-    document.getElementById('hero-img').innerHTML = `<span class="name" id="hero-name"></span>`
+    mainGameStyle.display = 'none'
+    initialFormStyle.display = 'flex'
+    characterInfoWrapper.innerHTML = `<span class="name" id="hero-name"></span>`
+})
+
+document.getElementById('attack-button').addEventListener('click', () => {
+    if (isPlayerTurn) {
+        isPlayerTurn = false
+        handleAttack(hero, currentEnemy)
+        makeEnemyMove()
+    }
+})
+
+document.getElementById('use-potion-button').addEventListener('click', () => {
+    if (isPlayerTurn) {
+        isPlayerTurn = false
+        handleUsePotion(hero)
+        makeEnemyMove()
+    }
+})
+
+document.getElementById('give-up-button').addEventListener('click', () => {
+    if (isPlayerTurn) {
+        isPlayerTurn = false
+        actionsLog.innerHTML += `<p>${hero.name} escolheu ser covarde.</p>`
+        handleGameOver(currentEnemy.name)
+    }
 })
 
 document.getElementById('player-form').addEventListener('submit', (event) => {
     event.preventDefault()
-    isPlayerTurn = true
-    restartGameButton.style.display = 'none'
-    actionButtonsWrapper.style.display = 'block'
-    initialForm.style.display = 'none'
-    mainGame.style.display = 'flex'
     const heroName = document.getElementById('player-name').value
+    const heroClass = document.querySelector('input[name="character-selection"]:checked').value
+    const heroStats = herosList[heroClass]
 
-    const character = document.querySelector('input[name="character-selection"]:checked').value
-
-    const randomEnemy = { ...enemiesList[Math.floor(Math.random() * enemiesList.length)] }
-    enemy = new Entity(...Object.values(randomEnemy))
-    hero = new Entity(heroName, ...Object.values(herosList[character]))
-
-    document.getElementById('hero-name').innerText = hero.name
-    document.getElementById('enemy-name').innerText = enemy.name
-    const imgWrapper = document.getElementById('hero-img')
-    imgWrapper.innerHTML = `<img src="../../assets/heros/${character}.png">` + imgWrapper.innerHTML
-    actionsLog.innerHTML = ''
+    startGame(heroName, heroClass, ...Object.values(heroStats), true)
 })
+
+
+let heroInfo = JSON.parse(localStorage.getItem('heroInfo'))
+if (heroInfo) {
+    if (confirm("Um jogo em andamento foi encontrado. Deseja continuar o jogo anterior?")) {
+        startGame(...Object.values(heroInfo), false)
+    }
+}
