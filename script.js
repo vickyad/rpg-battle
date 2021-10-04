@@ -1,4 +1,3 @@
-import herosList from './classesData.js'
 import enemiesList from './enemiesData.js'
 
 /* DOM Elements */
@@ -19,6 +18,28 @@ let isPlayerTurn = false
 let hero
 let currentEnemy
 
+const pokemonList = ['audino', 'aromatisse', 'blissey', 'kyurem', 'carbink', 'rayquaza']
+const pokemonData = []
+
+for (let i = 0; i < pokemonList.length; i++) {
+    let myRequest = new Request(`https://pokeapi.co/api/v2/pokemon/${pokemonList[i]}/`)
+    let pokemonInfoObject
+    await fetch(myRequest)
+        .then(response => response.json())
+        .then(info => {
+            pokemonInfoObject = { health: info.stats[0].base_stat * 6, attack: info.stats[1].base_stat }
+        })
+    pokemonData.push(pokemonInfoObject)
+}
+
+const herosList = {
+    bard: { ...pokemonData[0] },
+    healer: { ...pokemonData[1] },
+    tank: { ...pokemonData[2] },
+    ninja: { ...pokemonData[3] },
+    warrior: { ...pokemonData[4] },
+    mage: { ...pokemonData[5] }
+}
 
 class Entity {
     constructor(name, health, attack) {
